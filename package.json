@@ -1,0 +1,31 @@
+{
+  "name": "lame-corner-bot",
+  "version": "1.0.0",
+  "description": "Whatever we need for discord",
+  "main": "index.js",
+  "scripts": {
+    "debug": "node --inspect-brk index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint --cache ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lobabob/lame-corner-bot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lobabob/lame-corner-bot/issues"
+  },
+  "homepage": "https://github.com/lobabob/lame-corner-bot#readme",
+  "dependencies": {
+    "bufferutil": "^4.0.1",
+    "discord.js": "^12.2.0",
+    "erlpack": "github:discord/erlpack",
+    "utf-8-validate": "^5.0.2",
+    "zlib-sync": "^0.1.7"
+  },
+  "devDependencies": {
+    "eslint": "^7.4.0"
+  }
+}

@@ -1,0 +1,45 @@
+env:
+  es6: true
+  node: true
+parserOptions:
+  sourceType: script
+extends: eslint:recommended
+rules:
+  brace-style: [error, 1tbs]
+  comma-dangle: [error, always-multiline]
+  comma-spacing: error
+  comma-style: error
+  curly: error
+  dot-location: [error, property]
+  indent: [error, 2]
+  keyword-spacing: error
+  linebreak-style: [error, unix]
+  max-len: [warn, { code: 120, tabWidth: 2 }]
+  max-nested-callbacks: [error, { max: 4 }]
+  no-buffer-constructor: error
+  no-cond-assign: [error, except-parens]      # Safeguard from accidental use of = instead of === within conditions
+  no-console: off
+  no-empty-function: error
+  no-lonely-if: error
+  no-multi-spaces: error                      # This one will probably change most between projects
+  no-multiple-empty-lines: [error, { max: 2, maxEOF: 1, maxBOF: 0 }]
+  no-param-reassign: [error, { props: false }]
+  no-shadow: [error, { allow: [err, resolve, reject] }]
+  no-trailing-spaces: error
+  no-var: error
+  object-curly-newline: [error, { multiline: true, consistent: true }]
+  object-curly-spacing: [error, always]
+  prefer-const: error
+  quotes: [error, single]
+  semi: [error, always]
+  space-before-blocks: error
+  space-before-function-paren: [error, {
+    anonymous: never,
+    named: never,
+    asyncArrow: always
+  }]
+  space-infix-ops: error
+  space-unary-ops: error
+  spaced-comment: error
+  strict: [error, global]
+  yoda: error
