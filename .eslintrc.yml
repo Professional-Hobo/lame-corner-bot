@@ -3,6 +3,7 @@ env:
   node: true
 parserOptions:
   sourceType: script
+  ecmaVersion: 11
 extends: eslint:recommended
 rules:
   brace-style: [error, 1tbs]
