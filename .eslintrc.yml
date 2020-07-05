@@ -31,7 +31,7 @@ rules:
   object-curly-spacing: [error, always]
   prefer-const: error
   quotes: [error, single]
-  semi: [error, always]
+  semi: [warn, never]
   space-before-blocks: error
   space-before-function-paren: [error, {
     anonymous: never,
