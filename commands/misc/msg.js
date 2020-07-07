@@ -106,7 +106,8 @@ If a message string isn\'t provided, you will be prompted for message data in JS
             return resolve(CANCELLED)
           }
 
-          res.content = (res.content.match(/^```(.*?)```$/s) || [])[1] || res.content
+          // Parse out code block syntax if it's present
+          res.content = (res.content.match(/^```(?:[^\n]*?\n)?(.*?)```$/s) || [])[1] || res.content
           resolve(JSON.parse(res.content))
         } catch (err) {
           reject(err)
