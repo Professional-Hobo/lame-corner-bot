@@ -110,6 +110,10 @@ If a message string isn\'t provided, you will be prompted for message data in JS
           res.content = (res.content.match(/^```(?:[^\n]*?\n)?(.*?)```$/s) || [])[1] || res.content
           resolve(JSON.parse(res.content))
         } catch (err) {
+          if (err instanceof SyntaxError) {
+            err.res = embedRes.error('Invalid JSON :x:')
+          }
+
           reject(err)
         }
       })
@@ -200,13 +204,15 @@ for non-\`add\` operations.`)
         break
       }
     } catch (err) {
-      if (err.name === 'DiscordAPIError' && err.code === 50005) {
-        err.res = embedRes.warn('Insufficient Permissions', 'Can only edit messages authored by this bot.')
-      }
+      if (!err.res) {
+        if (err.name === 'DiscordAPIError' && err.code === 50005) {
+          err.res = embedRes.warn('Insufficient Permissions', 'Can only edit messages authored by this bot.')
+        }
 
-      if (err.name === 'DiscordAPIError' && err.code === 50035) {
-        err.res = embedRes.warn('Message Not Found', `Message id [${msg.id}] does not exist \
+        if (err.name === 'DiscordAPIError' && err.code === 50035) {
+          err.res = embedRes.warn('Message Not Found', `Message id [${msg.id}] does not exist \
 within <#${args.channel.id}>`)
+        }
       }
 
       throw err
