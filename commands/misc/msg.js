@@ -67,7 +67,7 @@ If a message string isn\'t provided, you will be prompted for message data in JS
    *
    * @param {Message} msg Message containing the command
    * @param {Channel} channel Channel to create the message in
-   * @param {string} messageId Id of the message to retrieve. Must be exist within the provided channel.
+   * @param {string} messageId Id of the message to retrieve. Must exist within the provided channel.
    * @returns {Promise}
    */
   async getMsg(msg, channel, messageId) {
@@ -137,7 +137,7 @@ If a message string isn\'t provided, you will be prompted for message data in JS
    *
    * @param {Message} msg Message containing the command
    * @param {Channel} channel Channel the message in
-   * @param {string} messageId Id of the message to set the contents of. Must be exist within the provided channel.
+   * @param {string} messageId Id of the message to set the contents of. Must exist within the provided channel.
    * @param {string} [content] Shortform. If not included, command author is prompted for message json body.
    * @returns {Promise}
    */
