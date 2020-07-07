@@ -5,6 +5,8 @@ const { MessageCollector, MessageAttachment, MessageEmbed, Channel, Message } = 
 const axios = require('axios')
 const embedRes = require('../../lib/embedRes')
 
+const CANCELLED = Symbol('cancelled')
+
 class MsgCommand extends Command {
   constructor(client) {
     super(client, {
@@ -48,13 +50,11 @@ If a message string isn\'t provided, you will be prompted for message data in JS
         type: 'channel',
       }, {
         key: 'messageId',
-        label: 'messageId/content',
         prompt: '',
         type: 'string', // Can't use message type since the target message can be from any channel in the guild
         default: '',
       }, {
         key: 'content',
-        label: '',
         prompt: '',
         type: 'string',
         default: '',
@@ -78,7 +78,7 @@ If a message string isn\'t provided, you will be prompted for message data in JS
       return msg.channel.send('Contents were larger than 2000 chars, so it\'s attached as a file instead',
         new MessageAttachment(Buffer.from(payload), 'content.json'))
     } else {
-      return msg.say(`\`\`\`\n${payload}\n\`\`\``)
+      return msg.code('javascript', payload)
     }
   }
 
@@ -86,7 +86,8 @@ If a message string isn\'t provided, you will be prompted for message data in JS
    * Prompts command author for message data. Must be in the form of JSON.
    *
    * @param {Message} msg Message containing the command
-   * @returns {Promise}
+   * @returns {Promise<object|CANCELLED>} Will resolve to CANCELLED symbol if command was cancelled
+   * after prompting for message data
    */
   async askForMsgData(msg) {
     await msg.channel.send('Data for the message? Must be valid JSON. Can be an attachment as well.')
@@ -101,6 +102,8 @@ If a message string isn\'t provided, you will be prompted for message data in JS
             const { data: fileData } = await axios.get(url, { responseType: 'arraybuffer' })
 
             res.content = Buffer.from(fileData, 'binary').toString()
+          } else if (res.content.toLowerCase() === 'cancel') {
+            return resolve(CANCELLED)
           }
 
           res.content = (res.content.match(/^```(.*?)```$/s) || [])[1] || res.content
@@ -111,7 +114,10 @@ If a message string isn\'t provided, you will be prompted for message data in JS
       })
     })
 
-    data.embeds = (data.embeds || []).map(embedData => new MessageEmbed(embedData))
+    if (data !== CANCELLED) {
+      data.embeds = (data.embeds || []).map(embedData => new MessageEmbed(embedData))
+    }
+
     return data
   }
 
@@ -129,7 +135,12 @@ If a message string isn\'t provided, you will be prompted for message data in JS
     }
 
     const data = await this.askForMsgData(msg)
-    return channel.send(data.content, data.embeds)
+
+    if (data !== CANCELLED) {
+      return channel.send(data.content, data.embeds)
+    } else {
+      return this.cancelMsg(channel)
+    }
   }
 
   /**
@@ -150,9 +161,13 @@ If a message string isn\'t provided, you will be prompted for message data in JS
 
     const data = await this.askForMsgData(msg)
 
-    await srcMsg.edit(data)
-    for (let i = 0; i < data.embeds.length; ++i) {
-      await srcMsg.edit(data.embeds[i])
+    if (data !== CANCELLED) {
+      await srcMsg.edit(data)
+      for (let i = 0; i < data.embeds.length; ++i) {
+        await srcMsg.edit(data.embeds[i])
+      }
+    } else {
+      return this.cancelMsg(channel)
     }
   }
 

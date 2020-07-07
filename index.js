@@ -4,7 +4,6 @@ require('dotenv').config() // Loads local .env file if it exists
 
 const path = require('path')
 const { Client } = require('discord.js-commando')
-const logger = require('./lib/logger')
 
 const client = new Client({
   owner: process.env.OWNER_ID,
@@ -19,7 +18,7 @@ client.registry
   .registerCommandsIn(path.join(__dirname, 'commands'))
 
 client.once('ready', () => {
-  logger.info(`[${client.user.tag}]: Logged in`)
+  console.log(`[${client.user.tag}]: Logged in`)
 })
 
 // client.on('message', async msg => {
@@ -34,6 +33,6 @@ client.once('ready', () => {
 client
   .login(process.env.DISCORD_TOKEN)
   .catch(err => {
-    logger.error('Failed to login.', err)
+    console.error('Failed to login.', err)
     process.exit(1)
   })
