@@ -23,7 +23,7 @@ class MsgCommand extends Command {
       description: 'Message data manipulation (content and embeds both). Supports add/get/set operations.',
       details: 'If using embed info, https://discohook.org/ is very helpful in constructing the relevant JSON. \
 If a message string isn\'t provided, you will be prompted for message data in JSON form. Should look like:\n\n\
-```javascript\n\
+```json\n\
 {\n\
   "content": "message string here",\n\
   "embeds": []\n\
@@ -78,7 +78,7 @@ If a message string isn\'t provided, you will be prompted for message data in JS
       return msg.channel.send('Contents were larger than 2000 chars, so it\'s attached as a file instead',
         new MessageAttachment(Buffer.from(payload), 'content.json'))
     } else {
-      return msg.code('javascript', payload)
+      return msg.code('json', payload)
     }
   }
 
