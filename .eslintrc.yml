@@ -4,7 +4,11 @@ env:
 parserOptions:
   sourceType: script
   ecmaVersion: 11
-extends: eslint:recommended
+plugins:
+  - jsdoc
+extends:
+  - eslint:recommended
+  - plugin:jsdoc/recommended
 rules:
   brace-style: [error, 1tbs]
   comma-dangle: [error, always-multiline]
@@ -44,3 +48,4 @@ rules:
   spaced-comment: error
   strict: [error, global]
   yoda: error
+  jsdoc/require-returns-description: off
