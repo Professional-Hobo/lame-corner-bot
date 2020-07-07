@@ -133,7 +133,7 @@ If a message string isn\'t provided, you will be prompted for message data in JS
   }
 
   /**
-   * Sets an existing messages contents in a specified channel.
+   * Sets an existing message's contents in a specified channel.
    *
    * @param {Message} msg Message containing the command
    * @param {Channel} channel Channel the message in
@@ -185,11 +185,11 @@ for non-\`add\` operations.`)
       }
     } catch (err) {
       if (err.name === 'DiscordAPIError' && err.code === 50005) {
-        err.res = embedRes.warn('Do not have permissions to edit!', 'Can only edit messages authored by this bot.')
+        err.res = embedRes.warn('Insufficient Permissions', 'Can only edit messages authored by this bot.')
       }
 
       if (err.name === 'DiscordAPIError' && err.code === 50035) {
-        err.res = embedRes.warn('Message not Found!', `Message id [${msg.id}] does not exist \
+        err.res = embedRes.warn('Message Not Found', `Message id [${msg.id}] does not exist \
 within <#${args.channel.id}>`)
       }
 
