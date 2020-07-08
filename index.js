@@ -4,6 +4,7 @@ require('dotenv').config() // Loads local .env file if it exists
 
 const path = require('path')
 const { Client } = require('discord.js-commando')
+const jobs = require('./jobs')
 
 const client = new Client({
   owner: process.env.OWNER_ID,
@@ -21,18 +22,21 @@ client.once('ready', () => {
   console.log(`[${client.user.tag}]: Logged in`)
 })
 
-// client.on('message', async msg => {
-//   try {
-//     // TODO Register listeners for non-command stuff here
-//   } catch (err) {
-//     console.error(err)
-//     await msg.channel.send(brokenCmdMsg)
-//   }
-// })
+/**
+ * Entrypoint for the bot.
+ */
+async function start() {
+  try {
+    await client.login(process.env.DISCORD_TOKEN)
+    await jobs.register(client)
+  } catch (err) {
+    if (err.code === 'TOKEN_INVALID') {
+      console.error('Failed to login')
+    }
 
-client
-  .login(process.env.DISCORD_TOKEN)
-  .catch(err => {
-    console.error('Failed to login.', err)
+    console.error(err)
     process.exit(1)
-  })
+  }
+}
+
+start()
