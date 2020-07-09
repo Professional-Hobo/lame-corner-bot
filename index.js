@@ -19,6 +19,7 @@ client.registry
   .registerCommandsIn(path.join(__dirname, 'commands'))
 
 client.once('ready', () => {
+  client.user.setActivity(process.env.ACTIVITY)
   console.log(`[${client.user.tag}]: Logged in`)
 })
 
