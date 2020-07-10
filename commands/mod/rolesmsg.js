@@ -10,7 +10,7 @@ class RolesMsgCommand extends Command {
   constructor(client) {
     super(client, {
       name: 'rolesmsg',
-      group: 'misc',
+      group: 'mod',
       memberName: 'rolesmsg',
       /**
        * Not sure if user has correct perms in one channel will allow them to edit messages in any other channel.
@@ -19,7 +19,7 @@ class RolesMsgCommand extends Command {
       userPermissions: ['MANAGE_MESSAGES'],
       clientPermissions: ['MANAGE_MESSAGES'],
       guildOnly: true,
-      description: 'Create/update/delete/reorder games and associated roles in the roles channel message',
+      description: 'Add/edit/delete/reorder games and associated roles in the roles channel message',
       examples: [
         'rolesmsg add :emoji: GameName @role',
         'rolesmsg add :emoji: Game name with spaces in it @role',
@@ -34,7 +34,7 @@ class RolesMsgCommand extends Command {
         label: 'operation',
         prompt: '',
         type: 'string',
-        oneOf: ['add', 'create', 'edit', 'set', 'delete', 'remove', 'reorder', 'swap'],
+        oneOf: ['add', 'edit', 'set', 'delete', 'remove', 'reorder', 'swap'],
       }, {
         default: '',
         infinite: true,
@@ -68,7 +68,6 @@ class RolesMsgCommand extends Command {
 
       switch (args.op) {
       case 'add':
-      case 'create':
         await this.addRole(msg, args.args)
         break
 
