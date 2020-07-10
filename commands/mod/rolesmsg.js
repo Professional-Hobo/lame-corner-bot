@@ -4,7 +4,7 @@ const { Message, MessageEmbed } = require('discord.js')
 const Command = require('../../lib/Command')
 const embedRes = require('../../lib/embedRes')
 const { parseEmojiId, parseRoleId } = require('../../lib/utils')
-const ZERO_WIDTH = '​'
+const ZERO_WIDTH = '​' // <=== Invisible character, NOT empty string
 
 class RolesMsgCommand extends Command {
   constructor(client) {
