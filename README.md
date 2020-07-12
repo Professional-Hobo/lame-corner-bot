@@ -33,6 +33,12 @@ npm run build:infranet
 
 Either connect a mongo container to the infranet network, or have it running locally on your local machine. If running locally, your mongodb host will be `host.docker.internal`.
 
+##### E.g. mongo container setup
+
+```
+docker run -d --name mongo --network infranet mongo:4
+```
+
 #### Fill out env vars
 
 Create an `.env` file that's a copy of `example.env`. Fill it out.
