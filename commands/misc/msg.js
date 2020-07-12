@@ -1,11 +1,12 @@
 'use strict'
 
 const Command = require('../../lib/Command')
-const { MessageCollector, MessageAttachment, MessageEmbed, Channel, Message } = require('discord.js')
+const { MessageAttachment, MessageEmbed, Channel, Message } = require('discord.js')
 const axios = require('axios')
 const embedRes = require('../../lib/embedRes')
+const utils = require('../../lib/utils')
 
-const CANCELLED = Symbol('cancelled')
+const CANCELLED = Symbol.for('cancelled')
 
 class MsgCommand extends Command {
   constructor(client) {
@@ -91,39 +92,37 @@ If a message string isn\'t provided, you will be prompted for message data in JS
    */
   async askForMsgData(msg) {
     await msg.channel.send('Data for the message? Must be valid JSON. Can be an attachment as well.')
-    const collector = new MessageCollector(msg.channel, m => m.author.id === msg.author.id, { max: 1 })
+    const res = await utils.prompt(msg)
 
-    const data = await new Promise((resolve, reject) => {
-      collector.on('collect', async res => {
-        try {
-          // Check if there's an attachment to use. If so, it will override any provided content.
-          if (res.attachments.size > 0) {
-            const { url } = res.attachments.first()
-            const { data: fileData } = await axios.get(url, { responseType: 'arraybuffer' })
+    try {
+      if (res === CANCELLED) {
+        return CANCELLED
+      }
 
-            res.content = Buffer.from(fileData, 'binary').toString()
-          } else if (res.content.toLowerCase() === 'cancel') {
-            return resolve(CANCELLED)
-          }
+      // Check if there's an attachment to use. If so, it will override any provided content.
+      if (res.attachments.size > 0) {
+        const { url } = res.attachments.first()
+        const { data: fileData } = await axios.get(url, { responseType: 'arraybuffer' })
 
-          // Parse out code block syntax if it's present
-          res.content = (res.content.match(/^```(?:[^\n]*?\n)?(.*?)```$/s) || [])[1] || res.content
-          resolve(JSON.parse(res.content))
-        } catch (err) {
-          if (err instanceof SyntaxError) {
-            err.res = embedRes.error('Invalid JSON :x:')
-          }
+        res.content = Buffer.from(fileData, 'binary').toString()
+      }
 
-          reject(err)
-        }
-      })
-    })
+      // Parse out code block syntax if it's present
+      const data = JSON.parse((res.content.match(/^```(?:[^\n]*?\n)?(.*?)```$/s) || [])[1] || res.content)
 
-    if (data !== CANCELLED) {
-      data.embeds = (data.embeds || []).map(embedData => new MessageEmbed(embedData))
+      // Force embeds to be an array
+      data.embeds = Array.isArray(data.embeds) ?
+        data.embeds.map(embedData => new MessageEmbed(embedData)) :
+        []
+
+      return data
+    } catch (err) {
+      if (err instanceof SyntaxError) {
+        err.res = embedRes.error('Invalid JSON :x:')
+      }
+
+      throw err
     }
-
-    return data
   }
 
   /**
