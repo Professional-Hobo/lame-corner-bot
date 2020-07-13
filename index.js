@@ -14,6 +14,7 @@ const client = new Client({
 client.registry
   .registerGroups([
     { id: 'misc', name: 'Miscellaneous' },
+    { id: 'mod', name: 'Moderation' },
   ])
   .registerDefaults()
   .registerCommandsIn(path.join(__dirname, 'commands'))
