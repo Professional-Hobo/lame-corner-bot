@@ -21,7 +21,7 @@ Just merge into the master branch. CI will take care of the deployment process.
 - Docker
 - MongoDB (Can be run in a container)
 
-#### Set up docker network `infranet`
+#### Set up `infranet` docker network
 
 Only needed if it doesn't already exist. External containerized resources that the bot needs can be connected to this network.
 
@@ -48,7 +48,6 @@ Create an `.env` file that's a copy of `example.env`. Fill it out.
 ```
 npm start
 ```
-
 
 ## How to debug
 
