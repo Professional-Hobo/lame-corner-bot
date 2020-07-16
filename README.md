@@ -21,6 +21,12 @@ Just merge into the master branch. CI will take care of the deployment process.
 - Docker
 - MongoDB (Can be run in a container)
 
+If you ever install or remove an npm dependency, make sure to rebuild the image:
+
+```
+docker-compose build
+```
+
 #### Set up `infranet` docker network
 
 Only needed if it doesn't already exist. External containerized resources that the bot needs can be connected to this network.
