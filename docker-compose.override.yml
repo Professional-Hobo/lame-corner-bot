@@ -9,4 +9,3 @@ services:
       - ./:/app:cached
       # Hack to prevent baked in node_modules from being overridden
       - /app/node_modules
- 
