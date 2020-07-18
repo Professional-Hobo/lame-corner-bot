@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ./
+      target: dev
+    volumes:
+      - ./:/app:cached
+      # Hack to prevent baked in node_modules from being overridden
+      - /app/node_modules

@@ -1,0 +1,7 @@
+version: '3.8'
+
+services:
+  app:
+    command: nodemon --inspect-brk=0.0.0.0
+    ports:
+      - '9229:9229'

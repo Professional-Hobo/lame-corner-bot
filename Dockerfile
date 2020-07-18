@@ -41,5 +41,5 @@ CMD ["nodemon"]
 FROM base AS release
 ENV NODE_ENV=production
 COPY --from=deps /app/node_modules ./node_modules
-RUN rm -rf .eslintrc.json
+RUN rm -rf test .eslintrc.json
 CMD ["node", "."]

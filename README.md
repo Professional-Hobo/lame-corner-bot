@@ -1,44 +1,65 @@
 # Lame Corner Bot
 
-Whatever we need for discord.
+Custom bots with custom commands. Does whatever we need for discord.
 
-## Things we need to add
+## What are commands?
 
-- reaction roles message create/update
-- advanced message embed create/update
-- event registration/reminders
-- whitelist/blacklist command (for role)
-- general reminder command for users
-- command to add emote to server from url
+These are triggered when a guild message starts with the configured prefix. Take a look within the `commands/` dir. Each file has a description and examples of the command inside.
 
+## What are jobs?
 
-Leaderboard functionality?
-- leaderboards for games civ games
+These are long running tasks that are triggered from various discord events.
 
-## Commands
+## How to deploy
 
-Prefix used here is `!`.
+Just merge into the master branch. CI will take care of the deployment process.
 
-**Note:** This may not be the actual prefix used when deployed.
+## How to run locally
 
-#### `!msg <create/update/get> <channel> <messageId>`
-  - `<messageId>` is only required if getting/updating
-  - `<create/update/get>` can be abbreviated to `<c/u/g>`
-  - Allows you to create/modify messages with embeds. If you plan on editing a message, do a get first to see the
-    current message data. Make any changes you want and then update it with the modified data.
+#### Install dependencies
 
-## How to Deploy
+- Docker
+- npm
+- MongoDB (Can be run in a container)
 
-### Deps
+**If you ever install or remove an npm dependency, make sure to rebuild the image or it won't be present in your bot container:**
 
-- Node.js > v12
-- Npm
+```
+docker-compose build
+```
 
-### Set env vars
+#### Set up `infranet` docker network
 
-Directly inject env vars in deployment env or have a `.env` file.
+Only needed if it doesn't already exist. External containerized resources that the bot needs can be connected to this network.
 
-- `DISCORD_TOKEN` - Token for bot to login with
-- `PREFIX` - prefix used for all commands
-- `OWNER_ID` - user id of the bot owner
-  - gives them full control regardless of guild/server
+```
+npm run build:infranet
+```
+
+#### MongoDB connection
+
+Either connect a mongo container to the infranet network, or have it running locally on your local machine. If running locally, your mongodb host will be `host.docker.internal`.
+
+##### E.g. mongo container setup
+
+```
+docker run -d --name mongo --network infranet mongo:4
+```
+
+#### Fill out env vars
+
+Create an `.env` file that's a copy of `example.env`. Fill it out.
+
+#### Start the bot
+
+```
+npm start
+```
+
+## How to debug
+
+Start the bot in debug mode and connect with a debugger front-end of your choice (e.g. vscode, chrome dev tools, etc.)
+
+```
+npm run debug
+```
