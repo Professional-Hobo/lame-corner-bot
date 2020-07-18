@@ -19,9 +19,10 @@ Just merge into the master branch. CI will take care of the deployment process.
 #### Install dependencies
 
 - Docker
+- npm
 - MongoDB (Can be run in a container)
 
-If you ever install or remove an npm dependency, make sure to rebuild the image:
+**If you ever install or remove an npm dependency, make sure to rebuild the image or it won't be present in your bot container:**
 
 ```
 docker-compose build
