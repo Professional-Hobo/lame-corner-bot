@@ -1,0 +1,182 @@
+# Docs: https://docs.github.com/en/actions/reference
+
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - example.env
+      - .gitignore
+      - '**.md'
+      - docker-compose.debug.yml
+
+  # Run tests for any PRs merging into master
+  pull_request:
+    branches:
+      - master
+    paths-ignore:
+      - example.env
+      - .gitignore
+      - '**.md'
+      - docker-compose.debug.yml
+
+env:
+  IMAGE_NAME: lame-corner-bot
+
+jobs:
+  # IMPORTANT: If image tarballs are renamed, make sure they're correctly ignored in .dockerignore
+  build-images:
+    name: Build Docker images
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Cache dependencies
+        id: cache-deps
+        uses: actions/cache@v2
+        with:
+          path: ./image-deps.tar
+          key: Dockerfile[${{ hashFiles('./Dockerfile') }}]-Lockfile[${{ hashFiles('./package-lock.json') }}]-image-deps
+
+      - name: Cache base image
+        id: cache-base
+        uses: actions/cache@v2
+        with:
+          path: ./image-base.tar
+          key: Dockerfile[${{ hashFiles('./Dockerfile') }}]-image-base
+
+      - name: Install dependencies
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+        run: |
+          docker build --target deps -t $IMAGE_NAME:deps .
+          docker save $IMAGE_NAME:deps > image-deps.tar
+
+      - name: Load dependencies
+        if: steps.cache-deps.outputs.cache-hit == 'true'
+        run: docker load -i image-deps.tar
+
+      - name: Build base image
+        if: steps.cache-base.outputs.cache-hit != 'true'
+        run: |
+          docker build --target base -t $IMAGE_NAME:base .
+          docker save $IMAGE_NAME:base > image-base.tar
+
+      - name: Load base image
+        if: steps.cache-base.outputs.cache-hit == 'true'
+        run: docker load -i image-base.tar
+
+      - name: Build dev image
+        run: |
+          docker build --cache-from $IMAGE_NAME:deps --cache-from $IMAGE_NAME:base \
+            --target dev -t $IMAGE_NAME:dev .
+          docker save $IMAGE_NAME:dev > image-dev.tar
+
+      - name: Build release image
+        if: github.event == 'push'
+        run: |
+          docker build --cache-from $IMAGE_NAME:deps --cache-from $IMAGE_NAME:base \
+            --target release -t $IMAGE_NAME:${GITHUB_SHA::8} .
+          docker save $IMAGE_NAME:${GITHUB_SHA::8} > image-release.tar
+
+      - name: Upload dev image
+        uses: actions/upload-artifact@v2
+        with:
+          name: image-dev-${{ github.sha }}
+          path: ./image-dev.tar
+      
+      - name: Upload release image
+        if: github.event == 'push'
+        uses: actions/upload-artifact@v2
+        with:
+          name: image-release-${{ github.sha }}
+          path: ./image-release.tar
+  
+  test:
+    name: Tests
+    needs: build-images
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # env:
+    #   ENV_FILE: |
+    #     PREFIX=
+    #     DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }}
+    #     ACTIVITY=
+    #     OWNER_ID=
+    #     MONGODB_CONN=
+    #     ROLES_CHANNEL_ID=
+    #     ROLES_MSG_ID=
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Get dev image
+        uses: actions/download-artifact@v2
+        with:
+          name: image-dev-${{ github.sha }}
+
+      - name: Load dev image
+        run: docker load -i image-dev.tar
+
+      - name: Set up .env file with SeCrEtS!!1!1
+        run: echo $ENV_FILE > .env
+
+      - name: Lint
+        run: docker-compose -f docker-compose.test.yml run --rm sut npm run script:lint
+
+      # - name: Tests
+      #   run: |
+      #     docker-compose -f docker-compose.test.yml up -d mongo
+      #     docker-compose -f docker-compose.test.yml run --rm sut npm run script:test
+
+  # Push image to GitHub Packages.
+  deploy:
+    name: Deploy
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Get release image
+        uses: actions/download-artifact@v2
+        with:
+          name: image-release-${{ github.sha }}
+
+      - name: Deploy docker image
+        run: |
+          eval $(ssh-agent -s)
+          ssh-add <(echo "${{ secrets.DEPLOY_KEY }}")
+          mkdir -p ~/.ssh
+          echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+
+          scp docker-compose.yml deploy@fkdaya.me:~/apps/lame-corner-bot/
+          scp docker-compose.deploy.yml deploy@fkdaya.me:~/apps/lame-corner-bot/
+          ssh deploy@fkdaya.me docker load < image-release.tar
+
+          ssh deploy@fkdaya.me << EOF
+            export IMAGE_NAME="$IMAGE_NAME" IMAGE_TAG="${GITHUB_SHA::8}"
+
+            docker tag \$IMAGE_NAME:\$IMAGE_TAG \$IMAGE_NAME:latest
+
+            cd ~/apps/lame-corner-bot
+            docker-compose -f docker-compose.yml -f docker-compose.deploy.yml down
+            docker-compose -f docker-compose.yml -f docker-compose.deploy.yml up -d
+          EOF
+
+  cleanup:
+    name: Remove build artifacts
+    runs-on: ubuntu-latest
+    if: always()
+    needs:
+      - build-images
+      - test
+      - deploy
+    steps:
+      - uses: geekyeggo/delete-artifact@v1
+        with:
+          name: |
+            image-dev-${{ github.sha }}
+            image-release-${{ github.sha }}

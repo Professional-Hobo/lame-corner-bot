@@ -7,8 +7,10 @@
     "start": "docker-compose up app",
     "build:infranet": "docker network create infranet",
     "debug": "docker-compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.debug.yml run --rm --service-ports app",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "docker-compose run --rm app eslint --cache ."
+    "test": "npm run script:test",
+    "lint": "docker-compose run --rm app npm run script:lint",
+    "script:test": "echo \"Error: no test specified\" && exit 1",
+    "script:lint": "eslint --cache ."
   },
   "repository": {
     "type": "git",

@@ -6,7 +6,6 @@ FROM node:${NODE_VERSION}-alpine AS deps
 
 # Install latest build tooling for native addons
 RUN apk add --no-cache alpine-sdk python
-RUN npm set progress=false && npm config set depth 0
 
 WORKDIR /app
 COPY package-lock.json ./
