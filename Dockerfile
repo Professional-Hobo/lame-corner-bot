@@ -9,7 +9,11 @@ RUN apk add --no-cache alpine-sdk python
 RUN npm set progress=false && npm config set depth 0
 
 WORKDIR /app
-COPY package* ./
+COPY package-lock.json ./
+COPY ./bin/package-build.js ./bin/
+
+# Build a package.json from the lockfile
+RUN ./bin/package-build.js
 
 # Install prod deps and all deps separately for stage-specific usage
 RUN npm ci
