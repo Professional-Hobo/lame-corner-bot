@@ -1,0 +1,11 @@
+version: '3.8'
+
+# Note: This docker-compose file is meant to be used completely stand-alone.
+# Do not merge this with the base docker-compose.yml file.
+
+services:
+  # System under Test - naming convention used by many CI systems
+  sut:
+    image: ${IMAGE_NAME}:dev
+    env_file:
+      - .env

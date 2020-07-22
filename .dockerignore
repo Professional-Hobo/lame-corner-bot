@@ -79,3 +79,4 @@ example.env
 .git
 .gitignore
 LICENSE
+image*.tar

@@ -1,3 +1,5 @@
+![CI/CD Pipeline](https://github.com/Professional-Hobo/lame-corner-bot/workflows/CI/CD%20Pipeline/badge.svg)
+
 # Lame Corner Bot
 
 Custom bots with custom commands. Does whatever we need for discord.
