@@ -75,7 +75,7 @@ jobs:
           docker save $IMAGE_NAME:dev > image-dev.tar
 
       - name: Build release image
-        if: github.event == 'push'
+        if: github.event_name == 'push'
         run: |
           docker build --cache-from $IMAGE_NAME:deps --cache-from $IMAGE_NAME:base \
             --target release -t $IMAGE_NAME:${GITHUB_SHA::8} .
@@ -88,7 +88,7 @@ jobs:
           path: ./image-dev.tar
       
       - name: Upload release image
-        if: github.event == 'push'
+        if: github.event_name == 'push'
         uses: actions/upload-artifact@v2
         with:
           name: image-release-${{ github.sha }}
