@@ -3,7 +3,7 @@
 const { Message, MessageEmbed } = require('discord.js')
 const Command = require('../../lib/Command')
 const embedRes = require('../../lib/embedRes')
-const { parseEmojiId, parseRoleId } = require('../../lib/utils')
+const { parseEmojiId, parseRoleId, validEmoji } = require('../../lib/utils')
 const ZERO_WIDTH = '​' // <=== Invisible character, NOT empty string
 
 class RolesMsgCommand extends Command {
@@ -123,14 +123,14 @@ class RolesMsgCommand extends Command {
     const role = args.slice(-1)[0]
     const invalid = []
 
-    const fetchedEmoji = await this.channel.guild.emojis.resolveIdentifier(parseEmojiId(emoji))
-    const fetchedRole = await this.channel.guild.roles.fetch(parseRoleId(role))
+    const guildEmoji = await this.channel.guild.emojis.resolveIdentifier(parseEmojiId(emoji))
+    const guildRole = await this.channel.guild.roles.fetch(parseRoleId(role))
 
-    if (!fetchedEmoji) {
+    if (!guildEmoji && !validEmoji(emoji)) {
       invalid.push('emoji')
     }
 
-    if (!fetchedRole) {
+    if (!guildRole) {
       invalid.push('role')
     }
 
@@ -162,7 +162,7 @@ class RolesMsgCommand extends Command {
 
     this.roleMsg.edit(new MessageEmbed(this.roleMsg.embeds[0]))
     return msg.embed(embedRes.success('Role added successfully :white_check_mark:',
-      `Added "${emoji} ${name} @${fetchedRole.name}" as id **${this.roleCount()}**.`))
+      `Added "${emoji} ${name} @${guildRole.name}" as id **${this.roleCount()}**.`))
   }
 
   /**
@@ -187,18 +187,18 @@ class RolesMsgCommand extends Command {
     const role = args.slice(-1)[0]
     const invalid = []
 
-    const fetchedEmoji = await this.channel.guild.emojis.resolveIdentifier(parseEmojiId(emoji))
-    const fetchedRole = await this.channel.guild.roles.fetch(parseRoleId(role))
+    const guildEmoji = await this.channel.guild.emojis.resolveIdentifier(parseEmojiId(emoji))
+    const guildRole = await this.channel.guild.roles.fetch(parseRoleId(role))
 
     if (!this.validId(id)) {
       invalid.push('id')
     }
 
-    if (!fetchedEmoji) {
+    if (!guildEmoji && !validEmoji(emoji)) {
       invalid.push('emoji')
     }
 
-    if (!fetchedRole) {
+    if (!guildRole) {
       invalid.push('role')
     }
 
@@ -226,7 +226,7 @@ class RolesMsgCommand extends Command {
 
     this.roleMsg.edit(new MessageEmbed(this.roleMsg.embeds[0]))
     return msg.embed(embedRes.success('Updated role successfully :white_check_mark:',
-      `Updated ${emoji} ${name} @${fetchedRole.name} [id: **${id}**].`))
+      `Updated ${emoji} ${name} @${guildRole.name} [id: **${id}**].`))
   }
 
   /**
@@ -253,7 +253,7 @@ class RolesMsgCommand extends Command {
     }
 
     const { name, value } = this.fields.splice(id - 1, 1)[0]
-    const fetchedRole = await this.channel.guild.roles.fetch(parseRoleId(value))
+    const guildRole = await this.channel.guild.roles.fetch(parseRoleId(value))
 
     // Two items on last row, add placeholder
     if ((this.roleCount() - 2) % 3 === 0) {
@@ -272,7 +272,7 @@ class RolesMsgCommand extends Command {
 
     this.roleMsg.edit(new MessageEmbed(this.roleMsg.embeds[0]))
     return msg.embed(embedRes.success('Removed role successfully :white_check_mark:',
-      `Removed ${name} @${fetchedRole.name} [id: **${id}**].`))
+      `Removed ${name} @${guildRole.name} [id: **${id}**].`))
   }
 
   /**
