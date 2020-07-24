@@ -143,7 +143,7 @@ If a message string isn\'t provided, you will be prompted for message data in JS
     if (data !== CANCELLED) {
       return channel.send(data.content, data.embeds)
     } else {
-      return this.cancelMsg(channel)
+      return this.cancelMsg(msg.channel)
     }
   }
 
@@ -171,7 +171,7 @@ If a message string isn\'t provided, you will be prompted for message data in JS
         await srcMsg.edit(data.embeds[i])
       }
     } else {
-      return this.cancelMsg(channel)
+      return this.cancelMsg(msg.channel)
     }
   }
 
