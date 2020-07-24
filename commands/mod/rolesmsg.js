@@ -1,9 +1,10 @@
 'use strict'
 
 const { Message, MessageEmbed } = require('discord.js')
+const emojiRegex = require('emoji-regex')()
 const Command = require('../../lib/Command')
 const embedRes = require('../../lib/embedRes')
-const { parseEmojiId, parseRoleId, validEmoji } = require('../../lib/utils')
+const { parseEmojiId, parseRoleId } = require('../../lib/utils')
 const ZERO_WIDTH = '​' // <=== Invisible character, NOT empty string
 
 class RolesMsgCommand extends Command {
@@ -126,7 +127,7 @@ class RolesMsgCommand extends Command {
     const guildEmoji = await this.channel.guild.emojis.resolveIdentifier(parseEmojiId(emoji))
     const guildRole = await this.channel.guild.roles.fetch(parseRoleId(role))
 
-    if (!guildEmoji && !validEmoji(emoji)) {
+    if (!guildEmoji && !emojiRegex.test(emoji)) {
       invalid.push('emoji')
     }
 
@@ -194,7 +195,7 @@ class RolesMsgCommand extends Command {
       invalid.push('id')
     }
 
-    if (!guildEmoji && !validEmoji(emoji)) {
+    if (!guildEmoji && !emojiRegex.test(emoji)) {
       invalid.push('emoji')
     }
 
