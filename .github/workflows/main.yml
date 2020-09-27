@@ -152,12 +152,12 @@ jobs:
           mkdir -p ~/.ssh
           echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
 
-          rsync --chmod=664 --groupmap=*:deploy -ztvvve ssh docker-compose.yml docker-compose.deploy.yml \
+          rsync --chmod=664 --groupmap=*:deploy -ztve ssh docker-compose.yml docker-compose.deploy.yml \
             ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_DOMAIN }}:/srv/shared/lame-corner-bot/
 
-          ssh deploy@fkdaya.me docker load < image-release.tar
+          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_DOMAIN }} docker load < image-release.tar
 
-          ssh deploy@fkdaya.me << EOF
+          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_DOMAIN }} << EOF
             export IMAGE_NAME="$IMAGE_NAME" IMAGE_TAG="${GITHUB_SHA::8}"
 
             docker tag \$IMAGE_NAME:\$IMAGE_TAG \$IMAGE_NAME:latest
