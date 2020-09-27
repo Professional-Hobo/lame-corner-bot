@@ -152,8 +152,9 @@ jobs:
           mkdir -p ~/.ssh
           echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
 
-          rsync -av --chmod=664 --groupmap=*:deploy -e ssh docker-compose.yml docker-compose.deploy.yml \
+          rsync -ztv --chmod=664 --groupmap=*:deploy -e ssh docker-compose.yml docker-compose.deploy.yml \
             ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_DOMAIN }}:/srv/shared/lame-corner-bot/
+
           ssh deploy@fkdaya.me docker load < image-release.tar
 
           ssh deploy@fkdaya.me << EOF
