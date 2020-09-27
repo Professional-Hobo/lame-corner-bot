@@ -152,8 +152,8 @@ jobs:
           mkdir -p ~/.ssh
           echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
 
-          scp docker-compose.yml ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_DOMAIN }}:~/apps/lame-corner-bot/
-          scp docker-compose.deploy.yml ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_DOMAIN }}:~/apps/lame-corner-bot/
+          scp docker-compose.yml ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_DOMAIN }}:/srv/shared/lame-corner-bot/
+          scp docker-compose.deploy.yml ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_DOMAIN }}:/srv/shared/lame-corner-bot/
           ssh deploy@fkdaya.me docker load < image-release.tar
 
           ssh deploy@fkdaya.me << EOF
@@ -161,7 +161,7 @@ jobs:
 
             docker tag \$IMAGE_NAME:\$IMAGE_TAG \$IMAGE_NAME:latest
 
-            cd ~/apps/lame-corner-bot
+            cd /srv/shared/lame-corner-bot
             docker-compose -f docker-compose.yml -f docker-compose.deploy.yml down
             docker-compose -f docker-compose.yml -f docker-compose.deploy.yml up -d
           EOF
