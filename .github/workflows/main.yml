@@ -152,8 +152,8 @@ jobs:
           mkdir -p ~/.ssh
           echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
 
-          scp docker-compose.yml deploy@fkdaya.me:~/apps/lame-corner-bot/
-          scp docker-compose.deploy.yml deploy@fkdaya.me:~/apps/lame-corner-bot/
+          scp docker-compose.yml ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_DOMAIN }}:~/apps/lame-corner-bot/
+          scp docker-compose.deploy.yml ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_DOMAIN }}:~/apps/lame-corner-bot/
           ssh deploy@fkdaya.me docker load < image-release.tar
 
           ssh deploy@fkdaya.me << EOF
