@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/lobabob/lame-corner-bot#readme",
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "bufferutil": "^4.0.1",
     "discord.js": "^12.2.0",
     "discord.js-commando": "github:discordjs/Commando",
